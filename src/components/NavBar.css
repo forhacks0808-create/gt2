@@ -80,3 +80,24 @@
     display: inline;
   }
 }
+
+.gt-nav__avatar-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--ink);
+  color: var(--white);
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-decoration: none;
+  border-radius: 2px;
+  box-shadow: 2px 2px 0 var(--orange);
+  transition: transform var(--fast) ease;
+}
+
+.gt-nav__avatar-badge:hover {
+  transform: translate(-1px, -1px);
+}
+

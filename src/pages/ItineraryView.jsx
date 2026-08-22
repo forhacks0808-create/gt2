@@ -23,7 +23,7 @@ export default function ItineraryView() {
       <div>
         <NavBar />
         <div className="shell container" style={{ paddingTop: "3rem" }}>
-          <BoardingBar label="Loading trip" />
+          <BoardingBar label="Loading itinerary" />
         </div>
       </div>
     );
@@ -40,8 +40,20 @@ export default function ItineraryView() {
     setTrip(updated);
     const url = `${window.location.origin}/shared/${updated.shareId}`;
     await navigator.clipboard?.writeText(url).catch(() => {});
-    stamp("Link copied!");
+    stamp("Share link copied!");
     setSharing(false);
+  }
+
+  function handleShareWhatsApp() {
+    const url = `${window.location.origin}/shared/${trip.shareId || trip.id}`;
+    const text = `Check out my travel itinerary for ${trip.name} on GlobeTrotter: ${url}`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  function handleShareTwitter() {
+    const url = `${window.location.origin}/shared/${trip.shareId || trip.id}`;
+    const text = `Planning my upcoming journey: ${trip.name} with GlobeTrotter! ${url}`;
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, "_blank");
   }
 
   return (
@@ -56,23 +68,60 @@ export default function ItineraryView() {
           <h1 className="h-display h1" style={{ color: "var(--paper)" }}>
             {trip.name}
           </h1>
+
           <div className="itin-view__hero-actions">
             <Button variant="orange" onClick={handleShare} loading={sharing}>
-              Copy share link
+              🔗 Copy Share Link
             </Button>
-            <Button as={Link} to={`/trips/${tripId}/build`} variant="outline" magnetic={false}
-              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}>
-              Edit itinerary
+            <Button
+              as={Link}
+              to={`/trips/${tripId}/calendar`}
+              variant="outline"
+              magnetic={false}
+              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
+            >
+              📅 Calendar &amp; Timeline
             </Button>
-            <Button as={Link} to={`/trips/${tripId}/budget`} variant="outline" magnetic={false}
-              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}>
-              View budget
+            <Button
+              as={Link}
+              to={`/trips/${tripId}/budget`}
+              variant="outline"
+              magnetic={false}
+              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
+            >
+              💰 View Budget
+            </Button>
+            <Button
+              as={Link}
+              to={`/trips/${tripId}/build`}
+              variant="outline"
+              magnetic={false}
+              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
+            >
+              ✏️ Edit Stops
             </Button>
           </div>
         </div>
       </section>
 
       <section className="shell container itin-view__body">
+        {/* Social Share Bar */}
+        <div className="itin-social-bar ticket">
+          <span className="eyebrow">Share with travel companions:</span>
+          <div className="itin-social-btns">
+            <button className="itin-social-btn" onClick={handleShareWhatsApp}>
+              💬 WhatsApp
+            </button>
+            <button className="itin-social-btn" onClick={handleShareTwitter}>
+              🐦 Twitter / X
+            </button>
+            <button className="itin-social-btn" onClick={() => window.print()}>
+              🖨️ Print / PDF
+            </button>
+          </div>
+        </div>
+
+        {/* Days List */}
         {trip.days.map((day, i) => (
           <div key={day.date} className="itin-view__day">
             <div className="itin-view__day-marker">
@@ -84,15 +133,27 @@ export default function ItineraryView() {
                 <div className="itin-view__city-image">
                   <ImagePlaceholder label={cityName(day.cityId)} />
                 </div>
-                <h2 className="h-display h3">{cityName(day.cityId)}</h2>
+                <div>
+                  <h2 className="h-display h3">{cityName(day.cityId)}</h2>
+                  <p className="kicker grey-text">Day {i + 1} of {trip.days.length}</p>
+                </div>
               </div>
               {day.activities.length === 0 ? (
-                <p className="body-text grey-text">Nothing planned yet.</p>
+                <p className="body-text grey-text" style={{ padding: "1rem 0" }}>
+                  Free exploration day. No activities assigned yet.
+                </p>
               ) : (
                 <ul className="itin-view__activities">
                   {day.activities.map((a) => (
                     <li key={a.id}>
-                      <span>{a.name}</span>
+                      <div>
+                        <span style={{ fontWeight: 700 }}>{a.name}</span>
+                        {a.notes && (
+                          <p className="grey-text" style={{ fontSize: "0.82rem", margin: "2px 0 0" }}>
+                            {a.notes}
+                          </p>
+                        )}
+                      </div>
                       <span className="numeral">${Number(a.cost).toLocaleString()}</span>
                     </li>
                   ))}
@@ -102,9 +163,12 @@ export default function ItineraryView() {
           </div>
         ))}
 
-        <div className="itin-view__total">
-          <span className="eyebrow">Total estimated cost</span>
-          <span className="numeral" style={{ fontSize: "2rem" }}>
+        <div className="itin-view__total ticket">
+          <div>
+            <span className="eyebrow">Estimated Total Cost</span>
+            <p className="kicker grey-text">Sum of all scheduled activities</p>
+          </div>
+          <span className="numeral" style={{ fontSize: "2.25rem", color: "var(--orange)" }}>
             ${total.toLocaleString()}
           </span>
         </div>

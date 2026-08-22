@@ -79,8 +79,43 @@
 .itin-view__total {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  border-top: 1px solid var(--ink);
-  padding-top: 1.5rem;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--white);
+  padding: 1.5rem 2rem;
   margin-top: 1rem;
 }
+
+.itin-social-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #fafaf8;
+  border: 1px solid var(--line);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.itin-social-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.itin-social-btn {
+  background: var(--white);
+  border: 1px solid var(--line);
+  padding: 6px 12px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all var(--fast) ease;
+}
+
+.itin-social-btn:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+

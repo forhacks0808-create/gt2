@@ -5,7 +5,9 @@ import "./NavBar.css";
 const LINKS = [
   { to: "/dashboard", label: "Dashboard" },
   { to: "/trips", label: "My Trips" },
-  { to: "/cities", label: "City Search" },
+  { to: "/cities", label: "Explore" },
+  { to: "/community", label: "Community" },
+  { to: "/admin", label: "Analytics" },
   { to: "/profile", label: "Profile" },
 ];
 
@@ -32,7 +34,9 @@ export default function NavBar() {
           ))}
         </nav>
         <div className="gt-nav__user">
-          <span className="kicker">{user?.name}</span>
+          <NavLink to="/profile" className="gt-nav__avatar-badge" title="Go to Profile">
+            {user?.name?.[0]?.toUpperCase() || "T"}
+          </NavLink>
           <button
             className="gt-btn gt-btn--ghost"
             onClick={() => {

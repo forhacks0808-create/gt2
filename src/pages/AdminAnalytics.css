@@ -1,0 +1,202 @@
+.admin-page {
+  padding-top: 3rem;
+  padding-bottom: 5rem;
+}
+
+.admin-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.admin-time-pills {
+  display: flex;
+  background: #f0eee9;
+  border: 1px solid var(--line);
+  padding: 3px;
+  gap: 4px;
+}
+
+.admin-time-pill {
+  border: none;
+  background: transparent;
+  padding: 6px 14px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  letter-spacing: var(--tracking-wide);
+  transition: all var(--fast) ease;
+}
+
+.admin-time-pill.is-active {
+  background: var(--ink);
+  color: var(--white);
+  box-shadow: 2px 2px 0 var(--orange);
+}
+
+.admin-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.admin-kpi-card {
+  padding: 1.75rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.admin-kpi-value {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  margin: 0.25rem 0;
+  line-height: 1;
+}
+
+.admin-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 900px) {
+  .admin-charts-grid {
+    grid-template-columns: 3fr 2fr;
+  }
+}
+
+.admin-panel {
+  padding: 1.75rem;
+  background: var(--white);
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-panel__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.5rem;
+}
+
+.admin-bar-chart {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  height: 220px;
+  padding-top: 1rem;
+  gap: 1rem;
+}
+
+.admin-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.admin-bar-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.admin-bar-track {
+  width: 100%;
+  max-width: 44px;
+  height: 160px;
+  background: #f4f3ef;
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid #e8e6e0;
+}
+
+.admin-bar-fill {
+  width: 100%;
+  background: var(--ink);
+  transition: height var(--med) ease;
+}
+
+.admin-bar-col:hover .admin-bar-fill {
+  background: var(--orange);
+}
+
+.admin-bar-lbl {
+  font-size: 0.72rem;
+}
+
+.admin-season-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  justify-content: center;
+  height: 100%;
+}
+
+.admin-season-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88rem;
+  margin-bottom: 4px;
+}
+
+.admin-season-bar {
+  height: 12px;
+  background: #f0eee9;
+  border: 1px solid #e2dfd7;
+  overflow: hidden;
+}
+
+.admin-tables-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 900px) {
+  .admin-tables-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.admin-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  padding: 8px 10px;
+  border-bottom: 2px solid var(--ink);
+  color: #6b6a66;
+}
+
+.admin-table td {
+  padding: 10px;
+  border-bottom: 1px dashed var(--line);
+}
+
+.admin-region-pill,
+.admin-cat-pill {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  background: #eeebe3;
+  padding: 2px 6px;
+  border-radius: 2px;
+}

@@ -7,6 +7,11 @@ const DEFAULT_USER = {
   id: "user-demo-1",
   name: "Demo Traveler",
   email: "demo@globetrotter.app",
+  phone: "+1 (555) 382-9901",
+  city: "San Francisco",
+  country: "United States",
+  bio: "Architectural explorer & culinary backpacker. Always planning the next rail journey.",
+  avatar: "avatar-1",
   language: "English",
   unit: "metric",
   currency: "USD",
@@ -30,18 +35,17 @@ function saveStoredUsers(users) {
   }
 }
 
-function simulateDelay(ms = 200) {
+function simulateDelay(ms = 150) {
   return new Promise((res) => setTimeout(res, ms));
 }
 
 export async function register({ name, email, password }) {
-  await simulateDelay(250);
+  await simulateDelay(200);
   const normalizedEmail = (email || "").toLowerCase().trim();
   const users = getStoredUsers();
 
   let existing = users.find((u) => u.email.toLowerCase() === normalizedEmail);
   if (existing) {
-    // If user already exists in demo storage, update the name and log them in
     existing.name = name || existing.name;
     saveStoredUsers(users);
   } else {
@@ -49,6 +53,11 @@ export async function register({ name, email, password }) {
       id: "user-" + Date.now(),
       name: name || "Traveler",
       email: normalizedEmail,
+      phone: "",
+      city: "",
+      country: "",
+      bio: "GlobeTrotter nomad.",
+      avatar: "avatar-1",
       language: "English",
       unit: "metric",
       currency: "USD",
@@ -65,19 +74,23 @@ export async function register({ name, email, password }) {
 }
 
 export async function login({ email, password }) {
-  await simulateDelay(200);
+  await simulateDelay(150);
   const normalizedEmail = (email || "").toLowerCase().trim();
   const users = getStoredUsers();
 
   let user = users.find((u) => u.email.toLowerCase() === normalizedEmail);
   if (!user) {
-    // For convenience in mock mode, create the user on login if not found
     const namePart = normalizedEmail.split("@")[0];
     const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
     user = {
       id: "user-" + Date.now(),
       name: formattedName || "Demo Traveler",
       email: normalizedEmail,
+      phone: "+1 (555) 019-2831",
+      city: "New York",
+      country: "United States",
+      bio: "Passionate wanderer & photographer.",
+      avatar: "avatar-1",
       language: "English",
       unit: "metric",
       currency: "USD",
@@ -122,4 +135,11 @@ export async function updateProfile(userId, patch) {
 export function logoutSession() {
   clearToken();
   localStorage.removeItem(USER_KEY);
+}
+
+export function deleteAccount() {
+  clearToken();
+  localStorage.removeItem(USER_KEY);
+  localStorage.removeItem("gt_trips_data");
+  localStorage.removeItem("gt_saved_destinations");
 }

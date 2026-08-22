@@ -13,8 +13,11 @@ import CitySearch from "./pages/CitySearch";
 import CreateTrip from "./pages/CreateTrip";
 import ItineraryBuilder from "./pages/ItineraryBuilder";
 import ItineraryView from "./pages/ItineraryView";
+import TripCalendar from "./pages/TripCalendar";
 import MyTrips from "./pages/MyTrips";
 import Budget from "./pages/Budget";
+import Community from "./pages/Community";
+import AdminAnalytics from "./pages/AdminAnalytics";
 import Profile from "./pages/Profile";
 import SharedTrip from "./pages/SharedTrip";
 
@@ -55,7 +58,10 @@ export default function App() {
               <Route path="/trips/new" element={<CreateTrip />} />
               <Route path="/trips/:tripId" element={<ItineraryView />} />
               <Route path="/trips/:tripId/build" element={<ItineraryBuilder />} />
+              <Route path="/trips/:tripId/calendar" element={<TripCalendar />} />
               <Route path="/trips/:tripId/budget" element={<Budget />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/admin" element={<AdminAnalytics />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
