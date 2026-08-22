@@ -37,12 +37,20 @@ export default function CitySearch() {
   const [cityResults, setCityResults] = useState(null);
 
   useEffect(() => {
-    setSavedCities(tripsApi.getSavedDestinations());
+    tripsApi
+      .getSavedDestinations()
+      .then((d) => setSavedCities(Array.isArray(d) ? d : []))
+      .catch(() => setSavedCities([]));
+
     if (user?.id) {
-      tripsApi.listTrips(user.id).then((trips) => {
-        setUserTrips(trips);
-        if (trips.length > 0) setSelectedTripId(trips[0].id);
-      });
+      tripsApi
+        .listTrips(user.id)
+        .then((trips) => {
+          const arr = Array.isArray(trips) ? trips : [];
+          setUserTrips(arr);
+          if (arr.length > 0) setSelectedTripId(arr[0].id);
+        })
+        .catch(() => setUserTrips([]));
     }
   }, [user?.id]);
 

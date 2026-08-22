@@ -26,7 +26,12 @@ export default function MyTrips() {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    tripsApi.listTrips(user?.id).then(setTrips);
+    if (user?.id) {
+      tripsApi
+        .listTrips(user.id)
+        .then((t) => setTrips(Array.isArray(t) ? t : []))
+        .catch(() => setTrips([]));
+    }
   }, [user?.id]);
 
   async function handleDelete() {

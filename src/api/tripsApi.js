@@ -1,7 +1,13 @@
 import { request } from "./apiClient";
 
 export async function listTrips(_userId) {
-  return request("/api/trips");
+  try {
+    const res = await request("/api/trips");
+    return Array.isArray(res) ? res : [];
+  } catch (err) {
+    console.error("listTrips error:", err);
+    return [];
+  }
 }
 
 export async function getTrip(tripId) {
@@ -48,6 +54,7 @@ export async function copyTrip(shareId, _newOwnerId) {
 export async function listCommunityTrips(filterVibe = "all") {
   try {
     const trips = await request("/api/public/community");
+    if (!Array.isArray(trips)) return [];
     if (filterVibe === "all") return trips;
     return trips.filter((t) => t.vibe?.toLowerCase().includes(filterVibe.toLowerCase()));
   } catch {
@@ -62,7 +69,8 @@ export async function likeCommunityTrip(_tripId) {
 // Saved Destinations Bookmarks
 export async function getSavedDestinations() {
   try {
-    return await request("/api/users/me/saved-destinations");
+    const res = await request("/api/users/me/saved-destinations");
+    return Array.isArray(res) ? res : [];
   } catch {
     return [];
   }

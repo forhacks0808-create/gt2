@@ -15,7 +15,12 @@ export default function Dashboard() {
   const [selectedRegion, setSelectedRegion] = useState("All");
 
   useEffect(() => {
-    tripsApi.listTrips(user?.id).then(setTrips);
+    if (user?.id) {
+      tripsApi
+        .listTrips(user.id)
+        .then((t) => setTrips(Array.isArray(t) ? t : []))
+        .catch(() => setTrips([]));
+    }
   }, [user?.id]);
 
   const now = new Date();

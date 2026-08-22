@@ -40,9 +40,16 @@ export default function Profile() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
-    setSavedCityIds(tripsApi.getSavedDestinations());
+    tripsApi
+      .getSavedDestinations()
+      .then((d) => setSavedCityIds(Array.isArray(d) ? d : []))
+      .catch(() => setSavedCityIds([]));
+
     if (user?.id) {
-      tripsApi.listTrips(user.id).then(setTrips);
+      tripsApi
+        .listTrips(user.id)
+        .then((t) => setTrips(Array.isArray(t) ? t : []))
+        .catch(() => setTrips([]));
     }
   }, [user?.id]);
 

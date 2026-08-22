@@ -16,8 +16,12 @@ export async function request(path, options = {}) {
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   const token = getToken();
   if (token) headers.Authorization = `Bearer ${token}`;
+  
   const response = await fetch(path, { ...options, headers });
   if (!response.ok) {
+    if (response.status === 401) {
+      clearToken();
+    }
     const body = await response.json().catch(() => ({}));
     throw new Error(body.message || "Request failed.");
   }
