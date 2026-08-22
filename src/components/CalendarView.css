@@ -171,6 +171,7 @@
   background: #e2dfd7;
   padding: 2px 4px;
   border-radius: 2px;
+  overflow-wrap: anywhere;
 }
 
 .cal-act-dot-count {
@@ -206,10 +207,13 @@
   font-weight: 800;
   height: fit-content;
   border: 1px solid var(--line);
+  flex: none;
+  white-space: nowrap;
 }
 
 .cal-act-info {
   flex: 1;
+  min-width: 0;
 }
 
 .cal-act-name {
@@ -275,6 +279,7 @@
 
 .cal-timeline-content {
   flex: 1;
+  min-width: 0;
   padding: 1.5rem;
   background: var(--white);
   border: 1px solid var(--line);
@@ -304,4 +309,9 @@
   background: #fafaf8;
   padding: 0.75rem 1rem;
   border: 1px solid #e8e6e0;
+}
+
+.cal-timeline-act-card > :first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }

@@ -125,19 +125,20 @@ export default function ItineraryView() {
         {trip.days.map((day, i) => (
           <div key={day.date} className="itin-view__day">
             <div className="itin-view__day-marker">
-              <span className="numeral">{String(i + 1).padStart(2, "0")}</span>
-              <span className="kicker grey-text">{day.date}</span>
+              <span className="kicker grey-text">{formatDayMonth(day.date)}</span>
             </div>
             <div className="itin-view__day-content">
-              <div className="itin-view__city-header">
-                <div className="itin-view__city-image">
-                  <ImagePlaceholder label={cityName(day.cityId)} />
+              {(i === 0 || trip.days[i - 1].cityId !== day.cityId) && (
+                <div className="itin-view__city-header">
+                  <div className="itin-view__city-image">
+                    <ImagePlaceholder label={cityName(day.cityId)} />
+                  </div>
+                  <div>
+                    <h2 className="h-display h3">{cityName(day.cityId)}</h2>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="h-display h3">{cityName(day.cityId)}</h2>
-                  <p className="kicker grey-text">Day {i + 1} of {trip.days.length}</p>
-                </div>
-              </div>
+              )}
+              <p className="itin-view__day-label h-display">Day {i + 1}</p>
               {day.activities.length === 0 ? (
                 <p className="body-text grey-text" style={{ padding: "1rem 0" }}>
                   Free exploration day. No activities assigned yet.
@@ -179,4 +180,12 @@ export default function ItineraryView() {
 
 function cityName(id) {
   return CITIES.find((c) => c.id === id)?.name || "Unassigned";
+}
+
+function formatDayMonth(date) {
+  const [, month, day] = date.split("-");
+  const monthName = new Date(2000, Number(month) - 1, 1).toLocaleString("en-US", {
+    month: "short",
+  });
+  return `${day} ${monthName}`;
 }
