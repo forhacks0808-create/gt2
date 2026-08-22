@@ -16,9 +16,9 @@ const REGION_COUNTRY_CODES = {
 export async function searchCities(query = "", region = "All") {
   const q = (query || "").trim();
 
-  // Build RapidAPI GeoDB URL dynamically
+  // Build RapidAPI GeoDB URL dynamically (free plan max: limit=10)
   const params = new URLSearchParams({
-    limit: "18",
+    limit: "10",
     sort: "-population",
   });
 
