@@ -1,0 +1,82 @@
+.gt-nav {
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.gt-nav__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.gt-nav__mark {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.gt-nav__mark-box {
+  width: 14px;
+  height: 14px;
+  background: var(--orange);
+  display: inline-block;
+}
+
+.gt-nav__links {
+  display: none;
+  gap: 1.75rem;
+}
+
+@media (min-width: 800px) {
+  .gt-nav__links {
+    display: flex;
+  }
+}
+
+.gt-nav__link {
+  text-decoration: none;
+  color: #6b6a66;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: color var(--fast) ease-out, border-color var(--fast) ease-out;
+}
+
+.gt-nav__link:hover {
+  color: var(--ink);
+}
+
+.gt-nav__link.is-active {
+  color: var(--ink);
+  border-color: var(--orange);
+}
+
+.gt-nav__user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.gt-nav__user .kicker {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .gt-nav__user .kicker {
+    display: inline;
+  }
+}

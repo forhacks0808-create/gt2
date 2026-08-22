@@ -1,0 +1,95 @@
+.gt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+}
+
+.gt-field__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b6a66;
+  transition: transform var(--fast) ease-out, color var(--fast) ease-out;
+  transform-origin: left;
+}
+
+.gt-field__label.is-focused {
+  color: var(--ink);
+  transform: translateY(-2px);
+}
+
+.gt-field__control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--white);
+  padding: 0 0.9rem;
+  transition: border-color var(--fast) ease-out, box-shadow var(--fast) ease-out;
+}
+
+.gt-field__control input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0.85rem 0;
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.gt-field__control.is-focused {
+  border-color: var(--orange);
+  animation: flash-settle 400ms ease-out;
+}
+
+.gt-field__control.has-error {
+  border-color: var(--orange);
+}
+
+@keyframes flash-settle {
+  0% {
+    border-color: var(--orange);
+  }
+  70% {
+    border-color: var(--orange);
+  }
+  100% {
+    border-color: var(--ink);
+  }
+}
+
+.gt-field__error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--orange);
+  animation: slide-down var(--fast) ease-out;
+}
+
+@keyframes slide-down {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gt-field__icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #6b6a66;
+  display: flex;
+  align-items: center;
+  padding: 0.4rem;
+}
+
+.gt-field__icon-btn:hover {
+  color: var(--ink);
+}

@@ -1,0 +1,103 @@
+.itin-builder {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+}
+
+.itin-builder__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.itin-builder__days {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.itin-builder__day-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--white);
+  cursor: pointer;
+  flex: none;
+}
+
+.itin-builder__day-tab.is-active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.itin-builder__day-tab.is-active .kicker {
+  color: var(--paper);
+}
+
+.itin-builder__body {
+  max-width: 640px;
+  padding-top: 1.5rem;
+}
+
+.itin-builder__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.itin-builder__item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.itin-builder__remove {
+  border: none;
+  background: transparent;
+  color: var(--orange);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.itin-builder__add {
+  display: grid;
+  grid-template-columns: 1fr 140px auto;
+  gap: 0.75rem;
+  align-items: end;
+  margin-bottom: 1.5rem;
+}
+
+@media (max-width: 640px) {
+  .itin-builder__add {
+    grid-template-columns: 1fr;
+  }
+}
+
+.itin-builder__suggestions {
+  margin-bottom: 1.5rem;
+}
+
+.itin-builder__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--line);
+  padding-top: 1rem;
+  font-size: 1.2rem;
+}

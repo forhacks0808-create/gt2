@@ -1,0 +1,52 @@
+.create-trip {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+}
+
+.create-trip__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 640px;
+}
+
+.create-trip__dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.create-trip__nights {
+  margin: -0.75rem 0 0;
+  color: var(--orange);
+  font-size: 1rem;
+}
+
+.create-trip__cities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.6rem;
+}
+
+.create-trip__city-chip {
+  border: 1px solid var(--ink);
+  background: var(--white);
+  color: var(--ink);
+  padding: 0.5rem 0.9rem;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: background var(--fast) ease-out, color var(--fast) ease-out;
+}
+
+.create-trip__city-chip.is-active {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.create-trip__city-chip:hover:not(.is-active) {
+  background: var(--orange-tint);
+  border-color: var(--orange);
+}

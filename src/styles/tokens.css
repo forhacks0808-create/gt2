@@ -1,0 +1,212 @@
+/* ==========================================================================
+   GlobeTrotter — Editorial-Brutalist design tokens
+   Single typeface (Urbanist) for everything — see prompt.md notes.
+   ========================================================================== */
+
+:root {
+  /* Color */
+  --ink: #0b0b0c;
+  --paper: #fafaf8;
+  --white: #ffffff;
+  --orange: #ff4d00;
+  --orange-tint: #ffede3;
+  --line: #d8d6d0;
+
+  /* Type */
+  --font: "Urbanist", system-ui, sans-serif;
+  --tracking-tight: -0.02em;
+  --tracking-wide: 0.08em;
+
+  /* Layout */
+  --gutter-mobile: 24px;
+  --gutter-desktop: 80px;
+  --radius: 2px;
+
+  /* Motion */
+  --fast: 150ms;
+  --med: 300ms;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Hard offset "shadow" — a printed sticker, not a blur */
+  --stamp: 4px 4px 0 var(--ink);
+  --stamp-lg: 8px 8px 0 var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: var(--font);
+}
+
+a {
+  color: inherit;
+}
+
+/* Focus ring — square, orange, visible. Never sacrificed for style. */
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 2px;
+}
+
+/* Custom cursor is desktop-only progressive enhancement; default cursor
+   otherwise. Kept out of critical path intentionally — see README. */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- Type scale helpers -------------------------------------------------
+   Hierarchy comes from weight / size / case / tracking within ONE family. */
+
+.h-display {
+  font-family: var(--font);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tight);
+  line-height: 0.98;
+  margin: 0;
+}
+
+.h1 {
+  font-size: clamp(2.5rem, 6vw, 6rem);
+}
+
+.h2 {
+  font-size: clamp(1.75rem, 4vw, 3.25rem);
+}
+
+.h3 {
+  font-size: clamp(1.25rem, 2.4vw, 1.9rem);
+}
+
+.eyebrow {
+  font-family: var(--font);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-size: 0.72rem;
+  color: var(--ink);
+}
+
+.eyebrow.on-orange {
+  color: var(--orange);
+}
+
+.kicker {
+  font-family: var(--font);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  font-size: 0.75rem;
+  color: #6b6a66;
+}
+
+.numeral {
+  font-family: var(--font);
+  font-weight: 800;
+  letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.body-text {
+  font-weight: 400;
+  color: #29282a;
+}
+
+.grey-text {
+  color: #6b6a66;
+}
+
+/* ---- Layout shell --------------------------------------------------------- */
+
+.shell {
+  padding-left: var(--gutter-mobile);
+  padding-right: var(--gutter-mobile);
+}
+
+@media (min-width: 900px) {
+  .shell {
+    padding-left: var(--gutter-desktop);
+    padding-right: var(--gutter-desktop);
+  }
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+hr.hairline {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+.dashed-rule {
+  border: none;
+  border-top: 1px dashed var(--line);
+  margin: 0;
+}
+
+/* Ticket-stub notch motif */
+.ticket {
+  position: relative;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+
+.ticket::before,
+.ticket::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--paper);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.ticket::before {
+  left: -8px;
+}
+
+.ticket::after {
+  right: -8px;
+}

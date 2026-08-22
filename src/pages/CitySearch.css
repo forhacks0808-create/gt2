@@ -1,0 +1,48 @@
+.city-search {
+  padding-top: 3rem;
+  padding-bottom: 4rem;
+}
+
+.city-search__results {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.city-card {
+  overflow: hidden;
+  transition: transform var(--fast) ease-out, box-shadow var(--fast) ease-out;
+}
+
+.city-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--stamp);
+}
+
+.city-card__image {
+  height: 140px;
+}
+
+.city-card__body {
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.city-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.city-card__badge {
+  background: var(--orange-tint);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.5rem;
+}

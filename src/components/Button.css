@@ -1,0 +1,115 @@
+.gt-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius);
+  padding: 0.9rem 1.6rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: background var(--fast) ease-out, color var(--fast) ease-out,
+    transform var(--fast) ease-out, box-shadow var(--fast) ease-out;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gt-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.gt-btn__label {
+  position: relative;
+  display: inline-block;
+}
+
+.gt-btn__label::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--fast) ease-out;
+}
+
+.gt-btn:hover .gt-btn__label::after {
+  transform: scaleX(1);
+}
+
+.gt-btn--black {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.gt-btn--black:hover:not(:disabled) {
+  background: var(--orange);
+  color: var(--ink);
+}
+
+.gt-btn--orange {
+  background: var(--orange);
+  color: var(--ink);
+}
+
+.gt-btn--orange:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.gt-btn--outline {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+}
+
+.gt-btn--outline:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.gt-btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  padding: 0.4rem 0;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 600;
+}
+
+.gt-btn__progress {
+  display: block;
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  overflow: hidden;
+}
+
+.gt-btn--outline .gt-btn__progress,
+.gt-btn--ghost .gt-btn__progress {
+  background: rgba(11, 11, 12, 0.15);
+}
+
+.gt-btn__progress-bar {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: currentColor;
+  animation: boarding 900ms var(--ease) infinite;
+}
+
+@keyframes boarding {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}

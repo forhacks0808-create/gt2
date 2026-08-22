@@ -1,0 +1,17 @@
+.shared-trip__bar {
+  border-bottom: 1px solid var(--line);
+}
+
+.shared-trip__bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.shared-trip__watermark {
+  text-align: center;
+  margin-top: 2rem;
+  color: #6b6a66;
+}
