@@ -47,10 +47,17 @@ function buildDays(startDate, endDate, cityId) {
   return days;
 }
 
+const tripInclude = {
+  user: { select: { name: true } },
+  stops: { include: { activities: true }, orderBy: { orderIndex: "asc" } },
+  budget: true,
+};
+
 function serializeTrip(trip) {
   return {
     id: trip.id,
     ownerId: trip.userId,
+    ownerName: trip.user?.name || "Traveler",
     name: trip.title,
     description: trip.description || "",
     startDate: dateString(trip.startDate),
@@ -58,24 +65,41 @@ function serializeTrip(trip) {
     coverImage: trip.coverImage,
     coverCityId: trip.coverCityId,
     cities: trip.stops.map((stop) => stop.cityId || stop.cityName),
+    budgetBreakdown: trip.budget
+      ? {
+          transport: trip.budget.transportCost,
+          stay: trip.budget.stayCost,
+          meals: trip.budget.mealCost,
+          activities: trip.budget.activityCost,
+          misc: trip.budget.miscellaneousCost,
+          targetBudget: trip.budget.totalCost || 800,
+        }
+      : {
+          transport: 100,
+          stay: 250,
+          meals: 150,
+          activities: 50,
+          misc: 30,
+          targetBudget: 800,
+        },
     days: trip.stops.sort((a, b) => a.orderIndex - b.orderIndex).map((stop) => ({
       date: dateString(stop.arrivalDate),
       cityId: stop.cityId || stop.cityName,
       activities: stop.activities.map((activity) => ({
         id: activity.id,
         name: activity.title,
+        category: activity.category || "Sightseeing",
+        time: activity.startTime || "09:00",
         cost: activity.cost,
         notes: activity.notes || "",
       })),
     })),
     visibility: trip.isPublic ? "public" : "private",
     shareId: trip.shareToken,
+    likes: 42,
+    vibe: "Adventure",
   };
 }
-
-const tripInclude = {
-  stops: { include: { activities: true }, orderBy: { orderIndex: "asc" } },
-};
 
 async function createStops(tx, tripId, days = [], cities = []) {
   await tx.tripStop.createMany({
@@ -96,7 +120,9 @@ async function createStops(tx, tripId, days = [], cities = []) {
         data: activities.map((activity) => ({
           stopId: stops[index].id,
           title: activity.name || activity.title || "Activity",
+          category: activity.category || "Sightseeing",
           cost: Number(activity.cost) || 0,
+          startTime: activity.time || activity.startTime || null,
           notes: activity.notes || null,
         })),
       });
@@ -117,6 +143,7 @@ async function authRequired(req, res, next) {
   }
 }
 
+// Auth endpoints
 app.post("/api/auth/register", async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
@@ -148,6 +175,7 @@ app.patch("/api/users/me", authRequired, async (req, res, next) => {
   catch (error) { return next(error); }
 });
 
+// Trips endpoints
 app.get("/api/trips", authRequired, async (req, res, next) => {
   try {
     const trips = await prisma.trip.findMany({ where: { userId: req.userId }, include: tripInclude, orderBy: { startDate: "asc" } });
@@ -157,31 +185,38 @@ app.get("/api/trips", authRequired, async (req, res, next) => {
 
 app.post("/api/trips", authRequired, async (req, res, next) => {
   try {
-    const { name, title, startDate, endDate, cities = [], coverCityId, description } = req.body;
+    const { name, title, startDate, endDate, cities = [], coverCityId, description, budgetBreakdown } = req.body;
     const days = req.body.days?.length ? req.body.days : buildDays(startDate, endDate, cities[0]);
     const trip = await prisma.$transaction(async (tx) => {
-      const created = await tx.trip.create({ data: { userId: req.userId, title: name || title, description, startDate: dateOnly(startDate), endDate: dateOnly(endDate), coverCityId } });
+      const created = await tx.trip.create({
+        data: {
+          userId: req.userId,
+          title: name || title,
+          description,
+          startDate: dateOnly(startDate),
+          endDate: dateOnly(endDate),
+          coverCityId,
+        },
+      });
       await createStops(tx, created.id, days, cities);
+
+      if (budgetBreakdown) {
+        await tx.budget.create({
+          data: {
+            tripId: created.id,
+            transportCost: Number(budgetBreakdown.transport) || 0,
+            stayCost: Number(budgetBreakdown.stay) || 0,
+            mealCost: Number(budgetBreakdown.meals) || 0,
+            activityCost: Number(budgetBreakdown.activities) || 0,
+            miscellaneousCost: Number(budgetBreakdown.misc) || 0,
+            totalCost: Number(budgetBreakdown.targetBudget) || 800,
+          },
+        });
+      }
+
       return tx.trip.findUniqueOrThrow({ where: { id: created.id }, include: tripInclude });
     });
     return res.status(201).json(serializeTrip(trip));
-  } catch (error) { return next(error); }
-});
-
-app.get("/api/trips/:id/budget", authRequired, async (req, res, next) => {
-  try {
-    const trip = await prisma.trip.findFirstOrThrow({ where: { id: req.params.id, userId: req.userId } });
-    return res.json(await prisma.budget.findUnique({ where: { tripId: trip.id } }) || {});
-  } catch (error) { return next(error); }
-});
-
-app.put("/api/trips/:id/budget", authRequired, async (req, res, next) => {
-  try {
-    const trip = await prisma.trip.findFirstOrThrow({ where: { id: req.params.id, userId: req.userId } });
-    const fields = ["transportCost", "stayCost", "mealCost", "activityCost", "miscellaneousCost"];
-    const data = Object.fromEntries(fields.map((field) => [field, Number(req.body[field]) || 0]));
-    data.totalCost = fields.reduce((sum, field) => sum + data[field], 0);
-    return res.json(await prisma.budget.upsert({ where: { tripId: trip.id }, create: { tripId: trip.id, ...data }, update: data }));
   } catch (error) { return next(error); }
 });
 
@@ -195,10 +230,45 @@ app.get("/api/trips/:id", authRequired, async (req, res, next) => {
 app.patch("/api/trips/:id", authRequired, async (req, res, next) => {
   try {
     const current = await prisma.trip.findFirstOrThrow({ where: { id: req.params.id, userId: req.userId }, include: tripInclude });
-    const { days, cities, name, title, startDate, endDate, ...rest } = req.body;
+    const { days, cities, name, title, startDate, endDate, budgetBreakdown, ...rest } = req.body;
     const trip = await prisma.$transaction(async (tx) => {
-      await tx.trip.update({ where: { id: current.id }, data: { ...rest, ...(name || title ? { title: name || title } : {}), ...(startDate ? { startDate: dateOnly(startDate) } : {}), ...(endDate ? { endDate: dateOnly(endDate) } : {}) } });
-      if (days) { await tx.tripStop.deleteMany({ where: { tripId: current.id } }); await createStops(tx, current.id, days, cities || current.stops.map((stop) => stop.cityId)); }
+      await tx.trip.update({
+        where: { id: current.id },
+        data: {
+          ...rest,
+          ...(name || title ? { title: name || title } : {}),
+          ...(startDate ? { startDate: dateOnly(startDate) } : {}),
+          ...(endDate ? { endDate: dateOnly(endDate) } : {}),
+        },
+      });
+
+      if (budgetBreakdown) {
+        await tx.budget.upsert({
+          where: { tripId: current.id },
+          create: {
+            tripId: current.id,
+            transportCost: Number(budgetBreakdown.transport) || 0,
+            stayCost: Number(budgetBreakdown.stay) || 0,
+            mealCost: Number(budgetBreakdown.meals) || 0,
+            activityCost: Number(budgetBreakdown.activities) || 0,
+            miscellaneousCost: Number(budgetBreakdown.misc) || 0,
+            totalCost: Number(budgetBreakdown.targetBudget) || 800,
+          },
+          update: {
+            transportCost: Number(budgetBreakdown.transport) || 0,
+            stayCost: Number(budgetBreakdown.stay) || 0,
+            mealCost: Number(budgetBreakdown.meals) || 0,
+            activityCost: Number(budgetBreakdown.activities) || 0,
+            miscellaneousCost: Number(budgetBreakdown.misc) || 0,
+            totalCost: Number(budgetBreakdown.targetBudget) || 800,
+          },
+        });
+      }
+
+      if (days) {
+        await tx.tripStop.deleteMany({ where: { tripId: current.id } });
+        await createStops(tx, current.id, days, cities || current.stops.map((stop) => stop.cityId));
+      }
       return tx.trip.findUniqueOrThrow({ where: { id: current.id }, include: tripInclude });
     });
     return res.json(serializeTrip(trip));
@@ -227,6 +297,17 @@ app.get("/api/public/trips/:shareId", async (req, res) => {
   catch { return res.status(404).json({ message: "This trip isn't available or is no longer shared." }); }
 });
 
+app.get("/api/public/community", async (_req, res, next) => {
+  try {
+    const trips = await prisma.trip.findMany({
+      where: { isPublic: true },
+      include: tripInclude,
+      orderBy: { createdAt: "desc" },
+    });
+    return res.json(trips.map(serializeTrip));
+  } catch (error) { return next(error); }
+});
+
 app.post("/api/trips/copy/:shareId", authRequired, async (req, res, next) => {
   try {
     const source = await prisma.trip.findFirstOrThrow({ where: { shareToken: req.params.shareId, isPublic: true }, include: tripInclude });
@@ -239,11 +320,43 @@ app.post("/api/trips/copy/:shareId", authRequired, async (req, res, next) => {
   } catch (error) { return next(error); }
 });
 
+// Saved Destinations
+app.get("/api/users/me/saved-destinations", authRequired, async (req, res, next) => {
+  try {
+    const saved = await prisma.savedDestination.findMany({
+      where: { userId: req.userId },
+      orderBy: { createdAt: "desc" },
+    });
+    return res.json(saved.map((s) => s.city));
+  } catch (error) { return next(error); }
+});
+
+app.post("/api/users/me/saved-destinations", authRequired, async (req, res, next) => {
+  try {
+    const { city, country } = req.body;
+    const item = await prisma.savedDestination.upsert({
+      where: { userId_city_country: { userId: req.userId, city, country: country || "" } },
+      create: { userId: req.userId, city, country: country || "" },
+      update: {},
+    });
+    return res.status(201).json(item);
+  } catch (error) { return next(error); }
+});
+
+app.delete("/api/users/me/saved-destinations/:city", authRequired, async (req, res, next) => {
+  try {
+    await prisma.savedDestination.deleteMany({
+      where: { userId: req.userId, city: req.params.city },
+    });
+    return res.status(204).end();
+  } catch (error) { return next(error); }
+});
+
 app.use((error, _req, res, _next) => {
   console.error(error);
   if (error.code === "P2025") return res.status(404).json({ message: "Resource not found." });
   if (error.code === "P1000" || error.code === "P1001") {
-    return res.status(503).json({ message: "Database unavailable. Check backend/.env PostgreSQL credentials and make sure PostgreSQL is running." });
+    return res.status(503).json({ message: "Database unavailable. Check PostgreSQL connection." });
   }
   return res.status(500).json({ message: "Internal server error." });
 });

@@ -54,7 +54,7 @@ export default function Login() {
     setApiError("");
     setLoading(true);
     try {
-      await login({ email: "demo@globetrotter.app", password: "password123" });
+      await login({ email: "demo@globetrotter.app", password: "demo1234" });
       navigate("/dashboard");
     } catch (err) {
       setApiError(err.message);
