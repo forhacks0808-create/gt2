@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import * as tripsApi from "../api/tripsApi";
+import { searchCities } from "../api/citiesApi";
 import { CITIES } from "../data/cities";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
@@ -32,10 +33,17 @@ export default function Dashboard() {
   const totalDaysPlanned = trips?.reduce((s, t) => s + (t.days?.length || 0), 0) || 0;
 
   const regions = ["All", "Europe", "Asia", "Americas", "Africa"];
-  const filteredCities =
-    selectedRegion === "All"
-      ? CITIES.slice(0, 6)
-      : CITIES.filter((c) => c.region === selectedRegion);
+  const [recommendedCities, setRecommendedCities] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    searchCities("", selectedRegion).then((cities) => {
+      if (active) setRecommendedCities(Array.isArray(cities) ? cities.slice(0, 6) : []);
+    });
+    return () => {
+      active = false;
+    };
+  }, [selectedRegion]);
 
   return (
     <div>
@@ -165,7 +173,7 @@ export default function Dashboard() {
         </div>
 
         <div className="dash-dest-grid">
-          {filteredCities.map((city) => (
+          {recommendedCities.map((city) => (
             <div key={city.id} className="dash-dest-card ticket">
               <div className="dash-dest-card__img">
                 <ImagePlaceholder label={city.name} />

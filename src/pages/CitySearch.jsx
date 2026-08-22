@@ -57,15 +57,17 @@ export default function CitySearch() {
   useEffect(() => {
     let active = true;
     setCityResults(null);
-    searchCities(debounced).then((r) => {
-      if (active) {
-        let filtered = r;
-        if (selectedRegion !== "All") {
-          filtered = filtered.filter((c) => c.region === selectedRegion);
+    searchCities(debounced, selectedRegion)
+      .then((r) => {
+        if (active) {
+          setCityResults(Array.isArray(r) ? r : []);
         }
-        setCityResults(filtered);
-      }
-    });
+      })
+      .catch((err) => {
+        console.error("City fetch error:", err);
+        if (active) setCityResults([]);
+      });
+
     return () => {
       active = false;
     };
@@ -166,7 +168,7 @@ export default function CitySearch() {
               className={`city-mode-btn ${mode === "cities" ? "is-active" : ""}`}
               onClick={() => setMode("cities")}
             >
-              🌍 Destinations ({CITIES.length})
+              🌍 Destinations ({cityResults ? cityResults.length : "…"})
             </button>
             <button
               className={`city-mode-btn ${mode === "activities" ? "is-active" : ""}`}
