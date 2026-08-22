@@ -6,16 +6,9 @@ import { useAuth } from "../context/AuthContext";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
 import { ImagePlaceholder, BoardingBar } from "../components/Loader";
+import EmptyState from "../components/EmptyState";
 import { useStamp } from "../components/Stamp";
 import "./Community.css";
-
-const VIBE_FILTERS = [
-  { id: "all", label: "All Itineraries" },
-  { id: "cultural", label: "Cultural & Wine" },
-  { id: "food", label: "Food & Culinary" },
-  { id: "adventure", label: "Adventure & Nature" },
-  { id: "temples", label: "Temples & History" },
-];
 
 export default function Community() {
   const { user } = useAuth();
@@ -23,25 +16,30 @@ export default function Community() {
   const stamp = useStamp();
 
   const [trips, setTrips] = useState(null);
-  const [selectedVibe, setSelectedVibe] = useState("all");
   const [copyingId, setCopyingId] = useState(null);
-  const [likedIds, setLikedIds] = useState([]);
+  const [unpublishingId, setUnpublishingId] = useState(null);
+
+  async function loadCommunityTrips() {
+    setTrips(null);
+    const data = await tripsApi.listCommunityTrips();
+    setTrips(Array.isArray(data) ? data : []);
+  }
 
   useEffect(() => {
-    tripsApi.listCommunityTrips(selectedVibe).then(setTrips);
-  }, [selectedVibe]);
+    loadCommunityTrips();
+  }, []);
 
-  async function handleLike(tripId, e) {
-    e.preventDefault();
-    e.stopPropagation();
-    if (likedIds.includes(tripId)) return;
-
-    await tripsApi.likeCommunityTrip(tripId);
-    setLikedIds((prev) => [...prev, tripId]);
-    setTrips((prev) =>
-      prev.map((t) => (t.id === tripId ? { ...t, likes: (t.likes || 0) + 1 } : t))
-    );
-    stamp("Upvoted!");
+  async function handleToggleCommunity(tripId) {
+    setUnpublishingId(tripId);
+    try {
+      await tripsApi.toggleCommunityPublish(tripId);
+      stamp("Removed from Community Hub");
+      await loadCommunityTrips();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setUnpublishingId(null);
+    }
   }
 
   async function handleCopyTrip(trip, e) {
@@ -56,10 +54,15 @@ export default function Community() {
       return;
     }
 
-    const copied = await tripsApi.copyTrip(trip.shareId, user.id);
-    setCopyingId(null);
-    stamp("Added to your trips!");
-    navigate(`/trips/${copied.id}`);
+    try {
+      const copied = await tripsApi.copyTrip(trip.shareId, user.id);
+      stamp("Added to your trips!");
+      navigate(`/trips/${copied.id}`);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCopyingId(null);
+    }
   }
 
   return (
@@ -67,64 +70,61 @@ export default function Community() {
       <NavBar />
       <section className="shell container community-page">
         <div className="community-header">
-          <p className="eyebrow on-orange">GlobeTrotter Community Hub</p>
-          <h1 className="h-display h1" style={{ margin: "0.4rem 0 1rem" }}>
-            DISCOVER PUBLIC TRIPS
-          </h1>
-          <p className="body-text" style={{ maxWidth: 620 }}>
-            Explore curated journeys, real day-by-day travel plans, and crowd-sourced itineraries created by travelers worldwide. Copy any trip to customize your own adventure.
-          </p>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
+            <div>
+              <p className="eyebrow on-orange">Live Database Feed</p>
+              <h1 className="h-display h1" style={{ margin: "0.4rem 0 0.5rem" }}>
+                COMMUNITY EXPEDITIONS
+              </h1>
+              <p className="body-text grey-text" style={{ maxWidth: 620 }}>
+                Real trips published by users to the GlobeTrotter database. Explore real itineraries, or publish your own journeys for other travelers to discover.
+              </p>
+            </div>
+            <Button as={Link} to="/trips" variant="orange">
+              Manage Your Trips →
+            </Button>
+          </div>
         </div>
 
-        {/* Vibe Filter Pills */}
-        <div className="community-filters">
-          {VIBE_FILTERS.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setSelectedVibe(f.id)}
-              className={`community-filter-pill ${selectedVibe === f.id ? "is-active" : ""}`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {trips === null && <BoardingBar label="Loading community journeys" />}
+        {trips === null && <BoardingBar label="Querying community trips from database" />}
 
         {trips !== null && trips.length === 0 && (
-          <div className="community-empty ticket">
-            <h3 className="h-display h3">No public trips in this category yet</h3>
-            <p className="body-text grey-text">Share your own itinerary to feature it here!</p>
-          </div>
+          <EmptyState
+            title="NO COMMUNITY TRIPS PUBLISHED YET"
+            body="No trips have been made public yet in the database. Go to 'My Trips' and click 'Publish to Community' on any itinerary to be the first!"
+            action={
+              <Button as={Link} to="/trips" variant="black">
+                View My Trips to Publish
+              </Button>
+            }
+          />
         )}
 
         <div className="community-grid">
           {trips?.map((trip) => {
-            const cityName = CITIES.find((c) => c.id === trip.coverCityId)?.name || trip.cities?.[0] || "World";
+            const cityName = CITIES.find((c) => c.id === trip.coverCityId)?.name || trip.cities?.[0] || "Destination";
             const totalActivities = trip.days.reduce((acc, d) => acc + (d.activities?.length || 0), 0);
             const totalCost = trip.days.reduce(
               (acc, d) => acc + d.activities.reduce((s, a) => s + (Number(a.cost) || 0), 0),
               0
             );
-            const isLiked = likedIds.includes(trip.id);
+            const isOwner = user?.id && trip.ownerId === user.id;
 
             return (
               <div key={trip.id} className="community-card ticket">
                 <div className="community-card__image-wrap">
                   <ImagePlaceholder label={cityName} />
-                  {trip.vibe && <span className="community-vibe-tag">{trip.vibe}</span>}
+                  <span className="community-vibe-tag">PUBLIC EXPEDITION</span>
                 </div>
 
                 <div className="community-card__content">
                   <div className="community-card__meta-top">
-                    <span className="kicker grey-text">By {trip.ownerName || "Traveler"}</span>
-                    <button
-                      className={`community-like-btn ${isLiked ? "is-liked" : ""}`}
-                      onClick={(e) => handleLike(trip.id, e)}
-                      title="Upvote trip"
-                    >
-                      ❤️ <span className="numeral">{trip.likes || 0}</span>
-                    </button>
+                    <span className="kicker grey-text">Published by {trip.ownerName || "Traveler"}</span>
+                    {isOwner && (
+                      <span className="kicker" style={{ color: "var(--orange)", fontWeight: 800 }}>
+                        (YOUR TRIP)
+                      </span>
+                    )}
                   </div>
 
                   <h3 className="h-display h3" style={{ fontSize: "1.35rem", margin: "0.4rem 0" }}>
@@ -132,7 +132,7 @@ export default function Community() {
                   </h3>
 
                   <p className="body-text grey-text community-card__desc">
-                    {trip.description || `${trip.days.length} days exploring ${trip.cities.join(", ")}.`}
+                    {trip.description || `${trip.days.length} days traveling through ${trip.cities.join(", ")}.`}
                   </p>
 
                   <div className="community-card__stats">
@@ -146,7 +146,9 @@ export default function Community() {
                     </div>
                     <div>
                       <span className="eyebrow">Est. Cost</span>
-                      <span className="numeral" style={{ color: "var(--orange)" }}>${totalCost.toLocaleString()}</span>
+                      <span className="numeral" style={{ color: "var(--orange)" }}>
+                        ${totalCost.toLocaleString()}
+                      </span>
                     </div>
                   </div>
 
@@ -156,14 +158,28 @@ export default function Community() {
                     <Link to={`/shared/${trip.shareId}`} className="community-view-link">
                       View Itinerary →
                     </Link>
-                    <Button
-                      variant="orange"
-                      onClick={(e) => handleCopyTrip(trip, e)}
-                      loading={copyingId === trip.id}
-                      style={{ fontSize: "0.85rem", padding: "8px 14px" }}
-                    >
-                      + Copy Trip
-                    </Button>
+
+                    <div style={{ display: "flex", gap: "0.5rem" }}>
+                      {isOwner ? (
+                        <Button
+                          variant="outline"
+                          onClick={() => handleToggleCommunity(trip.id)}
+                          loading={unpublishingId === trip.id}
+                          style={{ fontSize: "0.78rem", padding: "6px 10px" }}
+                        >
+                          🔒 Unpublish
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="orange"
+                          onClick={(e) => handleCopyTrip(trip, e)}
+                          loading={copyingId === trip.id}
+                          style={{ fontSize: "0.82rem", padding: "6px 12px" }}
+                        >
+                          + Copy Trip
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

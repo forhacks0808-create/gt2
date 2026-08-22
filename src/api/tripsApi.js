@@ -34,6 +34,12 @@ export async function deleteTrip(tripId) {
   });
 }
 
+export async function toggleCommunityPublish(tripId) {
+  return request(`/api/trips/${tripId}/toggle-community`, {
+    method: "POST",
+  });
+}
+
 export async function shareTrip(tripId) {
   return request(`/api/trips/${tripId}/share`, {
     method: "POST",
@@ -50,20 +56,39 @@ export async function copyTrip(shareId, _newOwnerId) {
   });
 }
 
-// Community Itineraries
+// Community Itineraries from PostgreSQL database
 export async function listCommunityTrips(filterVibe = "all") {
   try {
     const trips = await request("/api/public/community");
     if (!Array.isArray(trips)) return [];
     if (filterVibe === "all") return trips;
     return trips.filter((t) => t.vibe?.toLowerCase().includes(filterVibe.toLowerCase()));
-  } catch {
+  } catch (err) {
+    console.error("listCommunityTrips error:", err);
     return [];
   }
 }
 
 export async function likeCommunityTrip(_tripId) {
   return true;
+}
+
+// Real-time Database Analytics
+export async function getAnalytics() {
+  try {
+    return await request("/api/admin/analytics");
+  } catch (err) {
+    console.error("getAnalytics error:", err);
+    return {
+      totalTrips: 0,
+      totalUsers: 0,
+      totalActivities: 0,
+      publicTripsCount: 0,
+      avgDuration: 0,
+      topCities: [],
+      topActivities: [],
+    };
+  }
 }
 
 // Saved Destinations Bookmarks

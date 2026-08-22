@@ -140,6 +140,38 @@
   margin-bottom: 2px;
 }
 
+.my-trips__community-toggle {
+  background: #f0eee9;
+  border: 1px solid var(--line);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  padding: 3px 8px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all var(--fast) ease;
+}
+
+.my-trips__community-toggle:hover {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.my-trips__community-toggle.is-public {
+  background: var(--orange);
+  color: var(--white);
+  border-color: var(--orange);
+}
+
+.my-trips__actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
 .trip-card__actions-row {
   display: flex;
   justify-content: space-between;

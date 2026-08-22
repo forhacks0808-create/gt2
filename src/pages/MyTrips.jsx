@@ -24,6 +24,7 @@ export default function MyTrips() {
   const [tab, setTab] = useState("all");
   const [confirmId, setConfirmId] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [togglingId, setTogglingId] = useState(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -41,6 +42,21 @@ export default function MyTrips() {
     setDeleting(false);
     setConfirmId(null);
     stamp("Trip deleted");
+  }
+
+  async function handleToggleCommunity(tripId) {
+    setTogglingId(tripId);
+    try {
+      const updated = await tripsApi.toggleCommunityPublish(tripId);
+      setTrips((prev) =>
+        prev.map((t) => (t.id === tripId ? { ...t, isPublic: updated.isPublic } : t))
+      );
+      stamp(updated.isPublic ? "Published to Community Hub!" : "Trip is now Private");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setTogglingId(null);
+    }
   }
 
   const now = new Date();
@@ -61,7 +77,7 @@ export default function MyTrips() {
       <section className="shell container my-trips">
         <div className="my-trips__head">
           <div>
-            <p className="eyebrow on-orange">Travel Logbook</p>
+            <p className="eyebrow on-orange">Personal Travel Logbook</p>
             <h1 className="h-display h1">MY TRIPS</h1>
           </div>
           <Button as={Link} to="/trips/new" variant="orange">
@@ -69,7 +85,7 @@ export default function MyTrips() {
           </Button>
         </div>
 
-        {/* Categorization Tabs: All / Ongoing / Upcoming / Completed */}
+        {/* Categorization Tabs */}
         <div className="my-trips__tabs">
           {STATUS_TABS.map((t) => (
             <button
@@ -101,10 +117,10 @@ export default function MyTrips() {
         {trips !== null && categorizedTrips.length === 0 && (
           <EmptyState
             title="NO TRIPS IN THIS SECTION"
-            body="You have no recorded trips in this category yet. Start drafting a new itinerary."
+            body="You have no recorded trips in this category. Click below to start drafting a new itinerary."
             action={
               <Button as={Link} to="/trips/new" variant="black">
-                Create an itinerary
+                Plan a New Trip
               </Button>
             }
           />
@@ -141,9 +157,19 @@ export default function MyTrips() {
                 <div className="trip-card__body-col">
                   <div className="trip-card__meta-row">
                     <span className="numeral my-trips__index">{String(i + 1).padStart(2, "0")}</span>
-                    <span className="kicker grey-text">
-                      {trip.startDate} — {trip.endDate} · {trip.days.length} DAYS
-                    </span>
+                    <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+                      <button
+                        className={`my-trips__community-toggle ${trip.isPublic ? "is-public" : ""}`}
+                        onClick={() => handleToggleCommunity(trip.id)}
+                        disabled={togglingId === trip.id}
+                        title="Click to publish/unpublish from Community Hub"
+                      >
+                        {trip.isPublic ? "🌐 In Community" : "➕ Share to Community"}
+                      </button>
+                      <span className="kicker grey-text">
+                        {trip.startDate} — {trip.endDate} · {trip.days.length} DAYS
+                      </span>
+                    </div>
                   </div>
 
                   <h3 className="h-display h2" style={{ fontSize: "1.6rem", margin: "0.25rem 0 0.5rem" }}>

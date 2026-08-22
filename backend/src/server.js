@@ -96,7 +96,9 @@ function serializeTrip(trip) {
     })),
     visibility: trip.isPublic ? "public" : "private",
     shareId: trip.shareToken,
-    likes: 42,
+    isPublic: trip.isPublic,
+    createdAt: trip.createdAt,
+    likes: 0,
     vibe: "Adventure",
   };
 }
@@ -230,7 +232,7 @@ app.get("/api/trips/:id", authRequired, async (req, res, next) => {
 app.patch("/api/trips/:id", authRequired, async (req, res, next) => {
   try {
     const current = await prisma.trip.findFirstOrThrow({ where: { id: req.params.id, userId: req.userId }, include: tripInclude });
-    const { days, cities, name, title, startDate, endDate, budgetBreakdown, ...rest } = req.body;
+    const { days, cities, name, title, startDate, endDate, budgetBreakdown, isPublic, ...rest } = req.body;
     const trip = await prisma.$transaction(async (tx) => {
       await tx.trip.update({
         where: { id: current.id },
@@ -239,6 +241,7 @@ app.patch("/api/trips/:id", authRequired, async (req, res, next) => {
           ...(name || title ? { title: name || title } : {}),
           ...(startDate ? { startDate: dateOnly(startDate) } : {}),
           ...(endDate ? { endDate: dateOnly(endDate) } : {}),
+          ...(typeof isPublic === "boolean" ? { isPublic } : {}),
         },
       });
 
@@ -284,6 +287,21 @@ app.delete("/api/trips/:id", authRequired, async (req, res, next) => {
   catch (error) { return next(error); }
 });
 
+// Community publish toggle
+app.post("/api/trips/:id/toggle-community", authRequired, async (req, res, next) => {
+  try {
+    const current = await prisma.trip.findFirstOrThrow({ where: { id: req.params.id, userId: req.userId } });
+    const nextPublic = !current.isPublic;
+    const shareToken = nextPublic && !current.shareToken ? crypto.randomBytes(6).toString("hex") : current.shareToken;
+    const updated = await prisma.trip.update({
+      where: { id: current.id },
+      data: { isPublic: nextPublic, shareToken },
+      include: tripInclude,
+    });
+    return res.json(serializeTrip(updated));
+  } catch (error) { return next(error); }
+});
+
 app.post("/api/trips/:id/share", authRequired, async (req, res, next) => {
   try {
     const trip = await prisma.trip.updateMany({ where: { id: req.params.id, userId: req.userId }, data: { isPublic: true, shareToken: crypto.randomBytes(6).toString("hex") } });
@@ -297,6 +315,7 @@ app.get("/api/public/trips/:shareId", async (req, res) => {
   catch { return res.status(404).json({ message: "This trip isn't available or is no longer shared." }); }
 });
 
+// Real-time Community Hub feed
 app.get("/api/public/community", async (_req, res, next) => {
   try {
     const trips = await prisma.trip.findMany({
@@ -317,6 +336,65 @@ app.post("/api/trips/copy/:shareId", authRequired, async (req, res, next) => {
       return tx.trip.findUniqueOrThrow({ where: { id: created.id }, include: tripInclude });
     });
     return res.status(201).json(serializeTrip(copy));
+  } catch (error) { return next(error); }
+});
+
+// Dynamic Real-time Database Analytics
+app.get("/api/admin/analytics", async (_req, res, next) => {
+  try {
+    const totalTrips = await prisma.trip.count();
+    const totalUsers = await prisma.user.count();
+    const totalActivities = await prisma.activity.count();
+    const publicTripsCount = await prisma.trip.count({ where: { isPublic: true } });
+
+    // Calculate real average trip duration in days
+    const allTrips = await prisma.trip.findMany({ select: { startDate: true, endDate: true, createdAt: true } });
+    let avgDuration = 0;
+    if (allTrips.length > 0) {
+      const totalDays = allTrips.reduce((acc, t) => {
+        const diff = Math.max(1, Math.round((new Date(t.endDate) - new Date(t.startDate)) / (1000 * 60 * 60 * 24)));
+        return acc + diff;
+      }, 0);
+      avgDuration = Number((totalDays / allTrips.length).toFixed(1));
+    }
+
+    // Top cities from real trip stops
+    const topCitiesRaw = await prisma.tripStop.groupBy({
+      by: ["cityName", "country"],
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 8,
+    });
+    const topCities = topCitiesRaw.map((c, idx) => ({
+      rank: String(idx + 1).padStart(2, "0"),
+      name: c.cityName,
+      country: c.country || "Global",
+      tripsCount: c._count.id,
+    }));
+
+    // Top activities planned by users
+    const topActsRaw = await prisma.activity.groupBy({
+      by: ["title", "category"],
+      _count: { id: true },
+      orderBy: { _count: { id: "desc" } },
+      take: 8,
+    });
+    const topActivities = topActsRaw.map((a, idx) => ({
+      rank: String(idx + 1).padStart(2, "0"),
+      name: a.title,
+      category: a.category || "Sightseeing",
+      plannedCount: a._count.id,
+    }));
+
+    return res.json({
+      totalTrips,
+      totalUsers,
+      totalActivities,
+      publicTripsCount,
+      avgDuration,
+      topCities,
+      topActivities,
+    });
   } catch (error) { return next(error); }
 });
 
