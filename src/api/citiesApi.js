@@ -2,51 +2,57 @@ import { CITIES, ACTIVITIES_CATALOG, ACTIVITIES_BY_CITY } from "../data/cities";
 
 /**
  * Dynamic City & Experience Search API:
- * 1. Supports optional live RapidAPI GeoDB key (import.meta.env.VITE_GEODB_KEY).
- * 2. Dynamically queries live public OpenStreetMap/REST Countries geocoding.
- * 3. Returns live catalog results with full metadata, cost indexes, and regional mapping.
+ * Connects to RapidAPI GeoDB Cities with the provided key.
  */
 
-export async function searchCities(query) {
-  const q = (query || "").trim().toLowerCase();
+const GEODB_KEY = import.meta.env.VITE_GEODB_KEY || "490e6448bfmshaf22b2ed119de49p1d530ajsn5f5ae0305f23";
 
-  // If RapidAPI GeoDB key is provided, query the live commercial API
-  const geodbKey = import.meta.env.VITE_GEODB_KEY;
-  if (geodbKey && q.length >= 2) {
+export async function searchCities(query) {
+  const q = (query || "").trim();
+
+  // If search query is provided, fetch dynamic cities from RapidAPI GeoDB
+  if (q.length >= 2) {
     try {
       const res = await fetch(
-        `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${encodeURIComponent(q)}&limit=10`,
-        { headers: { "X-RapidAPI-Key": geodbKey } }
+        `https://wft-geo-db.p.rapidapi.com/v1/geo/cities?namePrefix=${encodeURIComponent(q)}&limit=10&sort=-population`,
+        {
+          headers: {
+            "x-rapidapi-key": GEODB_KEY,
+            "x-rapidapi-host": "wft-geo-db.p.rapidapi.com",
+          },
+        }
       );
       if (res.ok) {
         const json = await res.json();
-        return json.data.map((c) => ({
-          id: c.city.toLowerCase().replace(/\s+/g, "-"),
-          name: c.city,
-          country: c.country,
-          region: c.countryCode || "Global",
-          costIndex: Math.round(c.population ? Math.min(95, Math.max(30, c.population / 100000)) : 50),
-          popularity: 85,
-          avgDailyCost: 75,
-          description: `Vibrant destination in ${c.country} with rich culture and sights.`,
-          lat: c.latitude,
-          lng: c.longitude,
-        }));
+        if (json.data && json.data.length > 0) {
+          return json.data.map((c) => ({
+            id: (c.city || c.name || "").toLowerCase().replace(/\s+/g, "-"),
+            name: c.city || c.name,
+            country: c.country || "Global",
+            region: c.countryCode || "World",
+            costIndex: Math.round(c.population ? Math.min(95, Math.max(35, Math.log10(c.population) * 15)) : 50),
+            popularity: Math.min(98, Math.max(70, Math.round(Math.random() * 15 + 85))),
+            avgDailyCost: Math.round(c.population ? Math.min(180, Math.max(45, Math.log10(c.population) * 22)) : 65),
+            description: `Dynamic destination in ${c.country} (Pop. ${(c.population || 0).toLocaleString()}).`,
+            lat: c.latitude,
+            lng: c.longitude,
+          }));
+        }
       }
     } catch (err) {
-      console.warn("GeoDB API fetch failed, falling back to live open search:", err);
+      console.warn("RapidAPI GeoDB fetch error, using local catalog:", err);
     }
   }
 
-  // Dynamic search over live catalog
-  await new Promise((r) => setTimeout(r, 120));
+  // If query is empty or 1 letter, search the curated base catalog
+  await new Promise((r) => setTimeout(r, 60));
   if (!q) return CITIES;
 
   return CITIES.filter(
     (c) =>
-      c.name.toLowerCase().includes(q) ||
-      c.country.toLowerCase().includes(q) ||
-      c.region.toLowerCase().includes(q)
+      c.name.toLowerCase().includes(q.toLowerCase()) ||
+      c.country.toLowerCase().includes(q.toLowerCase()) ||
+      c.region.toLowerCase().includes(q.toLowerCase())
   );
 }
 
@@ -59,7 +65,7 @@ export async function getCity(id) {
       country: "Global Destination",
       region: "World",
       costIndex: 50,
-      popularity: 80,
+      popularity: 85,
       avgDailyCost: 70,
       description: "Custom journey destination.",
     };
@@ -68,7 +74,7 @@ export async function getCity(id) {
 }
 
 export async function getSuggestedActivities(cityId) {
-  await new Promise((r) => setTimeout(r, 100));
+  await new Promise((r) => setTimeout(r, 80));
   return ACTIVITIES_BY_CITY[cityId] || [
     "Historic Walking Tour",
     "Local Street Food Exploration",

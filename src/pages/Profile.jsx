@@ -60,10 +60,14 @@ export default function Profile() {
     setTimeout(() => setStatus(""), 1800);
   }
 
-  function handleRemoveSaved(cityId) {
-    const next = tripsApi.toggleSaveDestination(cityId);
-    setSavedCityIds(next);
+  async function handleRemoveSaved(cityId) {
+    setSavedCityIds((prev) => prev.filter((id) => id !== cityId));
     stamp("Removed from bookmarks");
+    try {
+      await tripsApi.toggleSaveDestination(cityId, true);
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   function handleDeleteAccount() {

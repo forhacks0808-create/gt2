@@ -71,10 +71,22 @@ export default function CitySearch() {
     };
   }, [debounced, selectedRegion]);
 
-  function handleToggleSave(cityId) {
-    const next = tripsApi.toggleSaveDestination(cityId);
-    setSavedCities(next);
-    stamp(next.includes(cityId) ? "Saved to profile" : "Removed bookmark");
+  async function handleToggleSave(cityId) {
+    const isCurrentlySaved = savedCities.includes(cityId);
+    const updatedList = isCurrentlySaved
+      ? savedCities.filter((id) => id !== cityId)
+      : [...savedCities, cityId];
+
+    setSavedCities(updatedList);
+    stamp(!isCurrentlySaved ? "Saved to profile" : "Removed bookmark");
+
+    try {
+      await tripsApi.toggleSaveDestination(cityId, isCurrentlySaved);
+    } catch (err) {
+      console.error("Failed to sync save destination:", err);
+      // Revert if API failed
+      setSavedCities(savedCities);
+    }
   }
 
   // Filter activities
