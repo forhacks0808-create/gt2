@@ -27,24 +27,78 @@
 
 .itin-view__day {
   display: grid;
-  grid-template-columns: 70px 1fr;
+  grid-template-columns: 76px minmax(0, 1fr);
   gap: 1.5rem;
   position: relative;
+  min-width: 0;
+}
+
+.itin-view__day::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 38px;
+  top: 2px;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--paper);
+  border-radius: 50%;
+  background: var(--orange);
+  box-shadow: 0 0 0 1px var(--orange);
+  animation: itinerary-node-pulse 2.4s ease-in-out infinite;
+  transform: translateX(-50%);
 }
 
 .itin-view__day:not(:last-child)::after {
   content: "";
   position: absolute;
-  left: 34px;
-  top: 40px;
+  left: 37px;
+  top: 16px;
   bottom: -32px;
-  border-left: 1px dashed var(--line);
+  width: 2px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--orange) 0,
+    var(--orange) 3px,
+    transparent 3px,
+    transparent 8px
+  );
+  background-position: 0 0;
+  animation: itinerary-dots 2.4s linear infinite;
+}
+
+@keyframes itinerary-dots {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 8px;
+  }
+}
+
+@keyframes itinerary-node-pulse {
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+  50% {
+    transform: translateX(-50%) scale(1.15);
+  }
 }
 
 .itin-view__day-marker {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+  position: relative;
+}
+
+.itin-view__day-marker .kicker {
+  position: absolute;
+  top: 0;
+  right: 54px;
+  width: max-content;
+  white-space: nowrap;
 }
 
 .itin-view__city-header {
@@ -52,6 +106,24 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 0.75rem;
+}
+
+.itin-view__day-content,
+.itin-view__city-header > div:last-child {
+  min-width: 0;
+}
+
+.itin-view__city-image .gt-image-placeholder {
+  min-height: 0;
+}
+
+.itin-view__city-header h2 {
+  overflow-wrap: anywhere;
+}
+
+.itin-view__day-label {
+  font-size: 1.1rem;
+  margin: 0.35rem 0 0.75rem;
 }
 
 .itin-view__city-image {
@@ -72,8 +144,21 @@
 .itin-view__activities li {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--line);
+}
+
+.itin-view__activities li > div,
+.itin-view__activities li > span:first-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.itin-view__activities li > .numeral {
+  flex: none;
+  white-space: nowrap;
 }
 
 .itin-view__total {
@@ -117,5 +202,40 @@
 .itin-social-btn:hover {
   background: var(--ink);
   color: var(--white);
+}
+
+@media (max-width: 640px) {
+  .itin-view__body {
+    padding-top: 2rem;
+  }
+
+  .itin-view__day {
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .itin-view__city-header {
+    gap: 0.75rem;
+  }
+
+  .itin-view__day-label {
+    font-size: 1rem;
+  }
+
+  .itin-view__city-image {
+    width: 48px;
+    height: 48px;
+  }
+
+  .itin-view__total {
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+
+  .itin-view__total > .numeral {
+    margin-left: auto;
+    white-space: nowrap;
+  }
 }
 
