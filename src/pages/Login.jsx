@@ -50,6 +50,19 @@ export default function Login() {
     }
   }
 
+  async function handleDemoLogin() {
+    setApiError("");
+    setLoading(true);
+    try {
+      await login({ email: "demo@globetrotter.app", password: "password123" });
+      navigate("/dashboard");
+    } catch (err) {
+      setApiError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="auth-split">
       <div className="auth-split__brand">
@@ -81,6 +94,7 @@ export default function Login() {
           <Field
             label="Email"
             type="email"
+            placeholder="demo@globetrotter.app"
             value={form.email}
             error={errors.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
@@ -89,6 +103,7 @@ export default function Login() {
           <Field
             label="Password"
             type={showPw ? "text" : "password"}
+            placeholder="••••••••"
             value={form.password}
             error={errors.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -112,15 +127,20 @@ export default function Login() {
           <Button type="submit" variant="black" loading={loading} className="auth-split__submit">
             Enter
           </Button>
+
+          <Button
+            type="button"
+            variant="orange"
+            onClick={handleDemoLogin}
+            loading={loading}
+            style={{ marginTop: "0.75rem", width: "100%" }}
+          >
+            ⚡ Quick Demo Login
+          </Button>
         </form>
 
         <p className="body-text auth-split__switch">
           New to GlobeTrotter? <Link to="/register">Create an account</Link>
-        </p>
-
-        <p className="kicker" style={{ marginTop: "1rem" }}>
-          Demo tip: register a fresh account first — auth is stored locally
-          in this browser, no backend server is running in this preview.
         </p>
       </div>
     </div>
