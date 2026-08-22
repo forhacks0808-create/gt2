@@ -77,8 +77,6 @@ export default function ItineraryView() {
               as={Link}
               to={`/trips/${tripId}/calendar`}
               variant="outline"
-              magnetic={false}
-              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
             >
               📅 Calendar &amp; Timeline
             </Button>
@@ -86,8 +84,6 @@ export default function ItineraryView() {
               as={Link}
               to={`/trips/${tripId}/budget`}
               variant="outline"
-              magnetic={false}
-              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
             >
               💰 View Budget
             </Button>
@@ -95,8 +91,6 @@ export default function ItineraryView() {
               as={Link}
               to={`/trips/${tripId}/build`}
               variant="outline"
-              magnetic={false}
-              style={{ borderColor: "var(--paper)", color: "var(--paper)" }}
             >
               ✏️ Edit Stops
             </Button>
@@ -130,12 +124,7 @@ export default function ItineraryView() {
             <div className="itin-view__day-content">
               {(i === 0 || trip.days[i - 1].cityId !== day.cityId) && (
                 <div className="itin-view__city-header">
-                  <div className="itin-view__city-image">
-                    <ImagePlaceholder label={cityName(day.cityId)} />
-                  </div>
-                  <div>
-                    <h2 className="h-display h3">{cityName(day.cityId)}</h2>
-                  </div>
+                  <h2 className="h-display h3 itin-view__city-badge">{cityName(day.cityId)}</h2>
                 </div>
               )}
               <p className="itin-view__day-label h-display">Day {i + 1}</p>

@@ -113,9 +113,15 @@
 
 .dash-hero .gt-btn--outline:hover:not(:disabled),
 .itin-view__hero .gt-btn--outline:hover:not(:disabled) {
-  background: #ffffff;
-  color: var(--ink);
-  border-color: #ffffff;
+  background: #ffffff !important;
+  color: #0b0b0c !important;
+  border-color: #ffffff !important;
+  box-shadow: 0 4px 14px rgba(255, 255, 255, 0.2);
+}
+
+.dash-hero .gt-btn--outline:hover:not(:disabled) *,
+.itin-view__hero .gt-btn--outline:hover:not(:disabled) * {
+  color: #0b0b0c !important;
 }
 
 /* Ghost button */

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import * as tripsApi from "../api/tripsApi";
 import { BoardingBar } from "../components/Loader";
-import EmptyState from "../components/EmptyState";
 import "./AdminAnalytics.css";
 
 export default function AdminAnalytics() {
@@ -17,7 +16,7 @@ export default function AdminAnalytics() {
       <div>
         <NavBar />
         <div className="shell container" style={{ paddingTop: "3rem" }}>
-          <BoardingBar label="Querying database metrics" />
+          <BoardingBar label="Loading analytics insights" />
         </div>
       </div>
     );
@@ -39,12 +38,12 @@ export default function AdminAnalytics() {
       <section className="shell container admin-page">
         <div className="admin-head">
           <div>
-            <p className="eyebrow on-orange">PostgreSQL Live Intelligence</p>
+            <p className="eyebrow on-orange">Live Intelligence</p>
             <h1 className="h-display h1" style={{ margin: "0.4rem 0 0.5rem" }}>
-              DATABASE METRICS
+              PLATFORM ANALYTICS
             </h1>
-            <p className="body-text grey-text">
-              Real-time platform statistics queried directly from your PostgreSQL relational database tables (`User`, `Trip`, `TripStop`, `Activity`, `Budget`).
+            <p className="body-text grey-text" style={{ maxWidth: 650 }}>
+              Real-time platform insights and travel metrics across all itineraries, destinations, and scheduled experiences.
             </p>
           </div>
         </div>
@@ -52,44 +51,44 @@ export default function AdminAnalytics() {
         {/* Dynamic KPI Cards */}
         <div className="admin-kpi-grid">
           <div className="admin-kpi-card ticket">
-            <span className="eyebrow">Trips in Database</span>
+            <span className="eyebrow">Trips Created</span>
             <h2 className="h-display h1 admin-kpi-value">{totalTrips}</h2>
-            <span className="kicker grey-text">Live count (`Trip` table)</span>
+            <span className="kicker grey-text">Total itineraries</span>
           </div>
 
           <div className="admin-kpi-card ticket">
-            <span className="eyebrow">Registered Users</span>
+            <span className="eyebrow">Registered Travelers</span>
             <h2 className="h-display h1 admin-kpi-value">{totalUsers}</h2>
-            <span className="kicker grey-text">Live count (`User` table)</span>
+            <span className="kicker grey-text">Active members</span>
           </div>
 
           <div className="admin-kpi-card ticket">
-            <span className="eyebrow">Avg. Itinerary Length</span>
-            <h2 className="h-display h1 admin-kpi-value">{avgDuration}d</h2>
-            <span className="kicker grey-text">Computed from real dates</span>
+            <span className="eyebrow">Avg. Trip Duration</span>
+            <h2 className="h-display h1 admin-kpi-value">{avgDuration} Days</h2>
+            <span className="kicker grey-text">Average journey span</span>
           </div>
 
           <div className="admin-kpi-card ticket">
-            <span className="eyebrow">Public Community Trips</span>
+            <span className="eyebrow">Public Expeditions</span>
             <h2 className="h-display h1 admin-kpi-value">{publicTripsCount}</h2>
-            <span className="kicker" style={{ color: "var(--orange)" }}>
+            <span className="kicker" style={{ color: "var(--orange)", fontWeight: 700 }}>
               {totalTrips > 0 ? Math.round((publicTripsCount / totalTrips) * 100) : 0}% of all trips
             </span>
           </div>
         </div>
 
-        {/* Database Tables Analysis */}
+        {/* Analytics Breakdown Tables */}
         <div className="admin-tables-grid">
-          {/* Top Destination Stops in DB */}
+          {/* Top Destinations */}
           <div className="admin-panel ticket">
             <div className="admin-panel__head">
               <h3 className="h-display h3">Top Destination Stops</h3>
-              <span className="kicker grey-text">Queried from `TripStop` table</span>
+              <span className="kicker grey-text">Most planned traveler spots</span>
             </div>
 
             {topCities.length === 0 ? (
-              <div style={{ padding: "2rem 0", textAlign: "center" }}>
-                <p className="kicker grey-text">No destination stops recorded in database yet.</p>
+              <div style={{ padding: "2.5rem 0", textAlign: "center" }}>
+                <p className="kicker grey-text">No destination stops recorded in itineraries yet.</p>
               </div>
             ) : (
               <table className="admin-table">
@@ -119,16 +118,16 @@ export default function AdminAnalytics() {
             )}
           </div>
 
-          {/* Top Activities in DB */}
+          {/* Most Added Activities */}
           <div className="admin-panel ticket">
             <div className="admin-panel__head">
               <h3 className="h-display h3">Most Added Activities</h3>
-              <span className="kicker grey-text">Queried from `Activity` table ({totalActivities} Total)</span>
+              <span className="kicker grey-text">{totalActivities} Experiences Total</span>
             </div>
 
             {topActivities.length === 0 ? (
-              <div style={{ padding: "2rem 0", textAlign: "center" }}>
-                <p className="kicker grey-text">No activities added to trips yet.</p>
+              <div style={{ padding: "2.5rem 0", textAlign: "center" }}>
+                <p className="kicker grey-text">No activities added to itineraries yet.</p>
               </div>
             ) : (
               <table className="admin-table">

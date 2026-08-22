@@ -75,47 +75,25 @@ export default function Dashboard() {
           </div>
 
           <div className="dash-hero__stats ticket">
-            <div className="dash-hero__stats-top">
-              <span className="dash-pulse-dot" />
-              <span className="eyebrow" style={{ color: "#a19f99", fontSize: "0.68rem" }}>
-                LIVE DIRECTORY &amp; DISCOVERY
-              </span>
-            </div>
-
             <div className="dash-hero__stats-main">
               <div className="dash-hero__stat-item">
-                <span className="eyebrow">Places to Explore</span>
-                <span className="numeral h-display h2" style={{ color: "var(--orange)" }}>
-                  <AnimatedCounter end={744} suffix="K+" duration={1400} />
-                </span>
-                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
-                  Worldwide Cities
+                <span className="eyebrow">TRIPS IN PLAY</span>
+                <span className="numeral h-display h1" style={{ color: "var(--orange)", fontSize: "2.75rem", marginTop: "0.25rem" }}>
+                  <AnimatedCounter end={trips?.length || 0} duration={800} />
                 </span>
               </div>
 
               <div className="dash-hero__stat-item">
-                <span className="eyebrow">Countries</span>
-                <span className="numeral h-display h2" style={{ color: "var(--white)" }}>
-                  <AnimatedCounter end={195} suffix="+" duration={1200} />
-                </span>
-                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
-                  Mapped Hubs
+                <span className="eyebrow">DESTINATIONS</span>
+                <span className="numeral h-display h1" style={{ color: "var(--orange)", fontSize: "2.75rem", marginTop: "0.25rem" }}>
+                  <AnimatedCounter end={totalCitiesPlanned} duration={900} />
                 </span>
               </div>
 
               <div className="dash-hero__stat-item">
-                <span className="eyebrow">
-                  {trips && trips.length > 0 ? "Trips in Play" : "Curated Spots"}
-                </span>
-                <span className="numeral h-display h2" style={{ color: "var(--orange)" }}>
-                  {trips && trips.length > 0 ? (
-                    <AnimatedCounter end={trips.length} duration={800} />
-                  ) : (
-                    <AnimatedCounter end={10} suffix="K+" duration={1300} />
-                  )}
-                </span>
-                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
-                  {trips && trips.length > 0 ? `${totalDaysPlanned} Days Total` : "Experiences"}
+                <span className="eyebrow">DAYS PLANNED</span>
+                <span className="numeral h-display h1" style={{ color: "var(--orange)", fontSize: "2.75rem", marginTop: "0.25rem" }}>
+                  <AnimatedCounter end={totalDaysPlanned} duration={1000} />
                 </span>
               </div>
             </div>
