@@ -5,8 +5,7 @@ import Field from "../components/Field";
 import Button from "../components/Button";
 import EmptyState from "../components/EmptyState";
 import { ImagePlaceholder, BoardingBar } from "../components/Loader";
-import { searchCities } from "../api/citiesApi";
-import { CITIES, ACTIVITIES_CATALOG } from "../data/cities";
+import { searchCities, searchActivities } from "../api/citiesApi";
 import * as tripsApi from "../api/tripsApi";
 import { useAuth } from "../context/AuthContext";
 import { useStamp } from "../components/Stamp";
@@ -91,16 +90,24 @@ export default function CitySearch() {
     }
   }
 
-  // Filter activities
-  const activityResults = ACTIVITIES_CATALOG.filter((act) => {
-    const matchesQuery =
-      act.name.toLowerCase().includes(debounced.toLowerCase()) ||
-      act.cityName.toLowerCase().includes(debounced.toLowerCase()) ||
-      act.category.toLowerCase().includes(debounced.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || act.category.toLowerCase() === selectedCategory.toLowerCase();
-    return matchesQuery && matchesCategory;
-  });
+  const [activityResults, setActivityResults] = useState(null);
+
+  useEffect(() => {
+    let active = true;
+    setActivityResults(null);
+    searchActivities(debounced, selectedCategory)
+      .then((r) => {
+        if (active) setActivityResults(Array.isArray(r) ? r : []);
+      })
+      .catch((err) => {
+        console.error("Activity fetch error:", err);
+        if (active) setActivityResults([]);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [debounced, selectedCategory]);
 
   async function handleConfirmAddToTrip() {
     if (!selectedTripId || !addToTripTarget) return;
@@ -174,7 +181,7 @@ export default function CitySearch() {
               className={`city-mode-btn ${mode === "activities" ? "is-active" : ""}`}
               onClick={() => setMode("activities")}
             >
-              🎟️ Activities &amp; Sights ({ACTIVITIES_CATALOG.length})
+              🎟️ Activities &amp; Sights ({activityResults ? activityResults.length : "…"})
             </button>
           </div>
         </div>
@@ -308,14 +315,16 @@ export default function CitySearch() {
         {/* Mode 2: Activities Grid */}
         {mode === "activities" && (
           <div className="activity-search__results">
-            {activityResults.length === 0 && (
+            {activityResults === null && <BoardingBar label="Querying catalog experiences" />}
+
+            {activityResults !== null && activityResults.length === 0 && (
               <EmptyState
                 title="NO EXPERIENCES FOUND"
                 body="Try searching for a different keyword or category."
               />
             )}
 
-            {activityResults.map((act) => (
+            {activityResults?.map((act) => (
               <div key={act.id} className="activity-card ticket">
                 <div className="activity-card__badge-row">
                   <span className="activity-cat-tag">{act.category}</span>

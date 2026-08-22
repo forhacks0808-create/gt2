@@ -430,6 +430,102 @@ app.delete("/api/users/me/saved-destinations/:city", authRequired, async (req, r
   } catch (error) { return next(error); }
 });
 
+// Catalog Destinations from PostgreSQL Database
+app.get("/api/cities", async (req, res, next) => {
+  try {
+    const { q, region } = req.query;
+    if (prisma.destination) {
+      const where = {};
+      if (region && region !== "All") where.region = region;
+      if (q && q.trim()) {
+        where.OR = [
+          { name: { contains: q.trim(), mode: "insensitive" } },
+          { country: { contains: q.trim(), mode: "insensitive" } },
+          { region: { contains: q.trim(), mode: "insensitive" } },
+        ];
+      }
+      return res.json(await prisma.destination.findMany({ where, orderBy: [{ popularity: "desc" }, { name: "asc" }] }));
+    }
+
+    let sql = 'SELECT * FROM "Destination"';
+    const conditions = [];
+    if (region && region !== "All") {
+      conditions.push(`"region" = '${region.replace(/'/g, "''")}'`);
+    }
+    if (q && q.trim()) {
+      const search = q.trim().toLowerCase().replace(/'/g, "''");
+      conditions.push(`(LOWER("name") LIKE '%${search}%' OR LOWER("country") LIKE '%${search}%' OR LOWER("region") LIKE '%${search}%')`);
+    }
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
+    }
+    sql += ' ORDER BY "popularity" DESC, "name" ASC';
+    const rows = await prisma.$queryRawUnsafe(sql);
+    return res.json(rows);
+  } catch (error) { return next(error); }
+});
+
+app.get("/api/cities/:id", async (req, res, next) => {
+  try {
+    if (prisma.destination) {
+      const city = await prisma.destination.findUnique({ where: { id: req.params.id } });
+      if (city) return res.json(city);
+    } else {
+      const rows = await prisma.$queryRawUnsafe(`SELECT * FROM "Destination" WHERE "id" = '${req.params.id.replace(/'/g, "''")}' LIMIT 1`);
+      if (rows.length > 0) return res.json(rows[0]);
+    }
+    return res.json({
+      id: req.params.id,
+      name: req.params.id.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+      country: "Global Destination",
+      region: "World",
+      costIndex: 50,
+      popularity: 85,
+      avgDailyCost: 70,
+      description: "Custom journey destination.",
+    });
+  } catch (error) { return next(error); }
+});
+
+// Catalog Activities from PostgreSQL Database
+app.get("/api/activities", async (req, res, next) => {
+  try {
+    const { q, category, cityId } = req.query;
+    if (prisma.catalogActivity) {
+      const where = {};
+      if (cityId) where.cityId = cityId;
+      if (category && category !== "All") where.category = category;
+      if (q && q.trim()) {
+        where.OR = [
+          { name: { contains: q.trim(), mode: "insensitive" } },
+          { description: { contains: q.trim(), mode: "insensitive" } },
+          { cityName: { contains: q.trim(), mode: "insensitive" } },
+        ];
+      }
+      return res.json(await prisma.catalogActivity.findMany({ where, orderBy: { createdAt: "asc" } }));
+    }
+
+    let sql = 'SELECT * FROM "CatalogActivity"';
+    const conditions = [];
+    if (cityId) {
+      conditions.push(`"cityId" = '${cityId.replace(/'/g, "''")}'`);
+    }
+    if (category && category !== "All") {
+      conditions.push(`"category" = '${category.replace(/'/g, "''")}'`);
+    }
+    if (q && q.trim()) {
+      const search = q.trim().toLowerCase().replace(/'/g, "''");
+      conditions.push(`(LOWER("name") LIKE '%${search}%' OR LOWER("description") LIKE '%${search}%' OR LOWER("cityName") LIKE '%${search}%')`);
+    }
+    if (conditions.length > 0) {
+      sql += ' WHERE ' + conditions.join(' AND ');
+    }
+    sql += ' ORDER BY "createdAt" ASC';
+    const rows = await prisma.$queryRawUnsafe(sql);
+    return res.json(rows);
+  } catch (error) { return next(error); }
+});
+
 app.use((error, _req, res, _next) => {
   console.error(error);
   if (error.code === "P2025") return res.status(404).json({ message: "Resource not found." });

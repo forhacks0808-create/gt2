@@ -101,3 +101,27 @@
   transform: translate(-1px, -1px);
 }
 
+.gt-nav__logout {
+  background: transparent;
+  border: 1px solid var(--orange);
+  color: var(--orange);
+  font-weight: 800;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+}
+
+.gt-nav__logout:hover {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: 2px 2px 0 var(--ink);
+  transform: translate(-1px, -1px);
+}
+
+

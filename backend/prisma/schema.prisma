@@ -96,3 +96,31 @@ model SavedDestination {
 
   @@unique([userId, city, country])
 }
+
+model Destination {
+  id           String   @id
+  name         String
+  country      String
+  region       String
+  population   Int?     @default(0)
+  costIndex    Int      @default(50)
+  popularity   Int      @default(90)
+  avgDailyCost Int      @default(75)
+  description  String
+  tag          String?
+  createdAt    DateTime @default(now())
+}
+
+model CatalogActivity {
+  id          String   @id @default(uuid())
+  cityId      String
+  cityName    String
+  name        String
+  category    String
+  duration    String
+  cost        Float    @default(0)
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([cityId])
+}

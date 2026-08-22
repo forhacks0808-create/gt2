@@ -6,6 +6,7 @@ import { searchCities } from "../api/citiesApi";
 import { CITIES } from "../data/cities";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
+import AnimatedCounter from "../components/AnimatedCounter";
 import { BoardingBar, ImagePlaceholder } from "../components/Loader";
 import EmptyState from "../components/EmptyState";
 import "./Dashboard.css";
@@ -74,17 +75,49 @@ export default function Dashboard() {
           </div>
 
           <div className="dash-hero__stats ticket">
-            <div className="dash-hero__stat-item">
-              <span className="eyebrow">Trips in Play</span>
-              <span className="numeral h-display h2">{trips?.length || 0}</span>
+            <div className="dash-hero__stats-top">
+              <span className="dash-pulse-dot" />
+              <span className="eyebrow" style={{ color: "#a19f99", fontSize: "0.68rem" }}>
+                LIVE DIRECTORY &amp; DISCOVERY
+              </span>
             </div>
-            <div className="dash-hero__stat-item">
-              <span className="eyebrow">Destinations</span>
-              <span className="numeral h-display h2">{totalCitiesPlanned}</span>
-            </div>
-            <div className="dash-hero__stat-item">
-              <span className="eyebrow">Days Planned</span>
-              <span className="numeral h-display h2">{totalDaysPlanned}</span>
+
+            <div className="dash-hero__stats-main">
+              <div className="dash-hero__stat-item">
+                <span className="eyebrow">Places to Explore</span>
+                <span className="numeral h-display h2" style={{ color: "var(--orange)" }}>
+                  <AnimatedCounter end={744} suffix="K+" duration={1400} />
+                </span>
+                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
+                  Worldwide Cities
+                </span>
+              </div>
+
+              <div className="dash-hero__stat-item">
+                <span className="eyebrow">Countries</span>
+                <span className="numeral h-display h2" style={{ color: "var(--white)" }}>
+                  <AnimatedCounter end={195} suffix="+" duration={1200} />
+                </span>
+                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
+                  Mapped Hubs
+                </span>
+              </div>
+
+              <div className="dash-hero__stat-item">
+                <span className="eyebrow">
+                  {trips && trips.length > 0 ? "Trips in Play" : "Curated Spots"}
+                </span>
+                <span className="numeral h-display h2" style={{ color: "var(--orange)" }}>
+                  {trips && trips.length > 0 ? (
+                    <AnimatedCounter end={trips.length} duration={800} />
+                  ) : (
+                    <AnimatedCounter end={10} suffix="K+" duration={1300} />
+                  )}
+                </span>
+                <span className="kicker" style={{ color: "#787672", fontSize: "0.65rem" }}>
+                  {trips && trips.length > 0 ? `${totalDaysPlanned} Days Total` : "Experiences"}
+                </span>
+              </div>
             </div>
           </div>
         </div>

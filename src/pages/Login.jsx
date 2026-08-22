@@ -95,7 +95,7 @@ export default function Login() {
             label="Email"
             type="email"
             placeholder="demo@globetrotter.app"
-            value={form.email}
+            value={form.email || ""}
             error={errors.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             autoComplete="email"
@@ -104,7 +104,7 @@ export default function Login() {
             label="Password"
             type={showPw ? "text" : "password"}
             placeholder="••••••••"
-            value={form.password}
+            value={form.password || ""}
             error={errors.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             autoComplete="current-password"

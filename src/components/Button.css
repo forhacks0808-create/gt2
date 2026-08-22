@@ -3,67 +3,94 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: none;
   cursor: pointer;
-  border-radius: var(--radius);
-  padding: 0.9rem 1.6rem;
-  font-weight: 700;
-  font-size: 0.95rem;
+  border-radius: 2px;
+  padding: 0.75rem 1.4rem;
+  font-weight: 800;
+  font-size: 0.88rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  transition: background var(--fast) ease-out, color var(--fast) ease-out,
-    transform var(--fast) ease-out, box-shadow var(--fast) ease-out;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  line-height: 1;
+  transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   overflow: hidden;
   white-space: nowrap;
 }
 
 .gt-btn:disabled {
   cursor: not-allowed;
-  opacity: 0.6;
+  opacity: 0.55;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .gt-btn__label {
   position: relative;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.gt-btn__label::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 2px;
-  background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform var(--fast) ease-out;
-}
-
-.gt-btn:hover .gt-btn__label::after {
-  transform: scaleX(1);
-}
-
-.gt-btn--black {
-  background: var(--ink);
-  color: var(--paper);
-}
-
-.gt-btn--black:hover:not(:disabled) {
-  background: var(--orange);
-  color: var(--ink);
-}
-
+/* Orange primary button - High visibility on both light and dark surfaces */
 .gt-btn--orange {
   background: var(--orange);
-  color: var(--ink);
+  color: #ffffff;
+  border: 1px solid #e04400;
 }
 
 .gt-btn--orange:hover:not(:disabled) {
-  background: var(--ink);
-  color: var(--paper);
+  background: #ff621e;
+  color: #ffffff;
+  border-color: #ff7a3d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(255, 77, 0, 0.38);
 }
 
+.gt-btn--orange:active:not(:disabled) {
+  transform: translateY(0);
+  background: #e04400;
+  box-shadow: none;
+}
+
+/* Black button */
+.gt-btn--black {
+  background: var(--ink);
+  color: var(--white);
+  border: 1px solid var(--ink);
+}
+
+.gt-btn--black:hover:not(:disabled) {
+  background: #232326;
+  color: var(--white);
+  border-color: #38383c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gt-btn--black:active:not(:disabled) {
+  transform: translateY(0);
+  background: #000000;
+}
+
+/* White button for dark backgrounds */
+.gt-btn--white {
+  background: #ffffff;
+  color: var(--ink);
+  border: 1px solid #ffffff;
+}
+
+.gt-btn--white:hover:not(:disabled) {
+  background: #f2f2ee;
+  color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+/* Outline button */
 .gt-btn--outline {
   background: transparent;
   color: var(--ink);
@@ -72,22 +99,51 @@
 
 .gt-btn--outline:hover:not(:disabled) {
   background: var(--ink);
-  color: var(--paper);
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
 }
 
+/* Outline buttons inside dark hero headers */
+.dash-hero .gt-btn--outline,
+.itin-view__hero .gt-btn--outline {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.dash-hero .gt-btn--outline:hover:not(:disabled),
+.itin-view__hero .gt-btn--outline:hover:not(:disabled) {
+  background: #ffffff;
+  color: var(--ink);
+  border-color: #ffffff;
+}
+
+/* Ghost button */
 .gt-btn--ghost {
   background: transparent;
-  color: var(--ink);
-  padding: 0.4rem 0;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 600;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 0.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+}
+
+.gt-btn--ghost:hover:not(:disabled) {
+  opacity: 1;
+  transform: translateX(2px);
+  color: var(--orange);
+}
+
+/* Loading state */
+.gt-btn.is-loading {
+  pointer-events: none;
 }
 
 .gt-btn__progress {
   display: block;
   width: 100%;
-  height: 4px;
+  height: 3px;
   background: rgba(255, 255, 255, 0.25);
   overflow: hidden;
 }
@@ -100,9 +156,9 @@
 .gt-btn__progress-bar {
   display: block;
   height: 100%;
-  width: 40%;
+  width: 45%;
   background: currentColor;
-  animation: boarding 900ms var(--ease) infinite;
+  animation: boarding 850ms cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 @keyframes boarding {
@@ -110,6 +166,6 @@
     transform: translateX(-100%);
   }
   100% {
-    transform: translateX(350%);
+    transform: translateX(300%);
   }
 }

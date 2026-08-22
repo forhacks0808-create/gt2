@@ -38,7 +38,7 @@ export default function NavBar() {
             {user?.name?.[0]?.toUpperCase() || "T"}
           </NavLink>
           <button
-            className="gt-btn gt-btn--ghost"
+            className="gt-nav__logout"
             onClick={() => {
               logout();
               navigate("/login");

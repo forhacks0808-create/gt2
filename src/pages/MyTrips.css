@@ -68,8 +68,11 @@
   display: grid;
   grid-template-columns: 1fr;
   background: var(--white);
-  border: 1px solid var(--line);
-  transition: transform var(--fast) ease, box-shadow var(--fast) ease;
+  border: 1px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform, box-shadow;
 }
 
 @media (min-width: 768px) {
@@ -79,8 +82,8 @@
 }
 
 .trip-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--stamp);
+  transform: translate(-3px, -4px);
+  box-shadow: 7px 7px 0 var(--ink);
 }
 
 .trip-card__image-col {
