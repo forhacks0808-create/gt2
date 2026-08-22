@@ -37,9 +37,29 @@ export function AuthProvider({ children }) {
     return updated;
   }
 
+  async function toggleSavedCity(cityId) {
+    const updated = await authApi.toggleSavedCity(cityId);
+    setUser(updated);
+    return updated;
+  }
+
+  async function deleteAccount() {
+    await authApi.deleteAccount();
+    setUser(null);
+  }
+
   return (
     <AuthContext.Provider
-      value={{ user, checkingSession, login, register, logout, updateProfile }}
+      value={{
+        user,
+        checkingSession,
+        login,
+        register,
+        logout,
+        updateProfile,
+        toggleSavedCity,
+        deleteAccount,
+      }}
     >
       {children}
     </AuthContext.Provider>
